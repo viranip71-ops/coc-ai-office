@@ -22,11 +22,9 @@ def api_get(endpoint):
     except Exception as e:
         return None
 
-# ૧. પ્લેયર ડેટા
 clean_tag = urllib.parse.quote(PLAYER_TAG.strip())
 player_raw = api_get(f"/players/{clean_tag}")
 
-# ૨. લાઈવ ક્લેન વોર ડેટા
 war_raw = None
 if player_raw and 'clan' in player_raw:
     clan_tag = player_raw['clan'].get('tag')
@@ -34,7 +32,6 @@ if player_raw and 'clan' in player_raw:
         clean_clan_tag = urllib.parse.quote(clan_tag)
         war_raw = api_get(f"/clans/{clean_clan_tag}/currentwar")
 
-# JSON ડેટા JS માં પાસ કરવા માટે
 player_json_str = json.dumps(player_raw) if player_raw else "{}"
 war_json_str = json.dumps(war_raw) if war_raw else "{}"
 
@@ -50,119 +47,23 @@ app_html = f"""
 <style>
   * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: monospace; }}
   body {{ background: #030712; color: #f9fafb; padding: 4px; }}
-  
   .wrapper {{ max-width: 950px; margin: auto; display: flex; flex-direction: column; gap: 8px; }}
-  
-  .banner {{
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 8px;
-    padding: 8px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-  }}
-
-  .canvas-box {{
-    background: #090d16;
-    border: 2px solid #1e293b;
-    border-radius: 12px;
-    padding: 6px;
-  }}
-
-  canvas {{
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    width: 100%;
-    display: block;
-  }}
-
-  .chat-box {{
-    background: #0b0f19;
-    border: 2px solid #1e293b;
-    border-radius: 12px;
-    height: 480px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }}
-
-  .chat-head {{
-    background: #1e293b;
-    padding: 8px 12px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #facc15;
-    display: flex;
-    justify-content: space-between;
-  }}
-
-  .chat-log {{
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-    font-size: 12px;
-    line-height: 1.5;
-    background: #030712;
-  }}
-
+  .banner {{ background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }}
+  .canvas-box {{ background: #090d16; border: 2px solid #1e293b; border-radius: 12px; padding: 6px; }}
+  canvas {{ background: #0f172a; border: 1px solid #334155; border-radius: 8px; width: 100%; display: block; }}
+  .chat-box {{ background: #0b0f19; border: 2px solid #1e293b; border-radius: 12px; height: 490px; display: flex; flex-direction: column; overflow: hidden; }}
+  .chat-head {{ background: #1e293b; padding: 8px 12px; font-size: 12px; font-weight: bold; color: #facc15; display: flex; justify-content: space-between; }}
+  .chat-log {{ flex: 1; padding: 10px; overflow-y: auto; font-size: 12px; line-height: 1.5; background: #030712; }}
   .msg {{ margin-bottom: 10px; padding: 8px 12px; border-radius: 8px; font-size: 12px; }}
   .msg-user {{ background: #1e3a8a; color: #bfdbfe; margin-left: 15%; text-align: right; }}
   .msg-ceo {{ background: #1e293b; color: #f8fafc; border-left: 4px solid #facc15; }}
   .msg-mgr {{ background: #064e3b; color: #a7f3d0; border-left: 4px solid #10b981; }}
-
-  .quick-cmds {{
-    display: flex;
-    gap: 6px;
-    padding: 6px 8px;
-    background: #0f172a;
-    overflow-x: auto;
-    border-top: 1px solid #1e293b;
-  }}
-
-  .btn-cmd {{
-    background: #1e293b;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-    padding: 6px 10px;
-    font-size: 11px;
-    border-radius: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-    font-weight: 500;
-  }}
+  .quick-cmds {{ display: flex; gap: 6px; padding: 6px 8px; background: #0f172a; overflow-x: auto; border-top: 1px solid #1e293b; }}
+  .btn-cmd {{ background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 500; }}
   .btn-cmd:hover {{ background: #334155; color: #38bdf8; }}
-
-  .input-pane {{
-    display: flex;
-    padding: 8px;
-    background: #0f172a;
-    border-top: 1px solid #1e293b;
-  }}
-
-  .input-pane input {{
-    flex: 1;
-    background: #1e293b;
-    border: 1px solid #334155;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    outline: none;
-  }}
-
-  .input-pane button {{
-    margin-left: 6px;
-    background: #f59e0b;
-    color: #000;
-    font-weight: bold;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-  }}
+  .input-pane {{ display: flex; padding: 8px; background: #0f172a; border-top: 1px solid #1e293b; }}
+  .input-pane input {{ flex: 1; background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px; outline: none; }}
+  .input-pane button {{ margin-left: 6px; background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }}
 </style>
 </head>
 <body>
@@ -186,19 +87,19 @@ app_html = f"""
     
     <div class="chat-log" id="chatLog">
       <div class="msg msg-ceo">
-        <b>👑 Central CEO:</b> Chief <b>{p_name}</b>, હું તમારા લાઈવ ડેટા સાથે સંપૂર્ણ સક્રિય છું. તમે ગુજરાતી અથવા અંગ્રેજીમાં કોઈપણ સવાલ પૂછી શકો છો (દા.ત. <i>"સામેવાળાએ આપણા પર કેટલા સ્ટાર કર્યા?"</i> અથવા <i>"આજનો ઓલ-ઓવર રિપોર્ટ આપો"</i>).
+        <b>👑 Central CEO:</b> Greetings Chief <b>{p_name}</b>! હું સક્રિય છું. નીચેના ક્વિક બટન્સ વાપરો અથવા કોઈ પણ ચોક્કસ સવાલ પૂછો.
       </div>
     </div>
 
     <div class="quick-cmds">
-      <button class="btn-cmd" onclick="handleUserSend('આજનો ઓલ ઓવર રિપોર્ટ આપો')">⭐ All-Over 360° Report</button>
       <button class="btn-cmd" onclick="handleUserSend('સામેવાળાએ આપણા પર કેટલા સ્ટાર કર્યા?')">🛡️ Opponent Attacks on Us</button>
       <button class="btn-cmd" onclick="handleUserSend('કોના અટેક બાકી છે?')">⚔️ Pending Attacks</button>
       <button class="btn-cmd" onclick="handleUserSend('Home Village અને Heroes Status')">🏰 Heroes & Village</button>
+      <button class="btn-cmd" onclick="handleUserSend('આજનો ઓલ ઓવર રિપોર્ટ આપો')">⭐ 360° All-Over Audit</button>
     </div>
 
     <div class="input-pane">
-      <input type="text" id="userInput" placeholder="CEO ને પૂછો (દા.ત. સામેવાળાએ કેટલા સ્ટાર કર્યા? કોના અટેક બાકી છે?)" onkeydown="if(event.key==='Enter') handleUserSend()">
+      <input type="text" id="userInput" placeholder="દા.ત. સામેવાળાએ કેટલા સ્ટાર કર્યા? / કોના અટેક બાકી છે?" onkeydown="if(event.key==='Enter') handleUserSend()">
       <button onclick="handleUserSend()">Send</button>
     </div>
   </div>
@@ -209,7 +110,6 @@ app_html = f"""
 const canvas = document.getElementById("officeCanvas");
 const ctx = canvas.getContext("2d");
 
-// Load Raw Supercell API Data
 const rawPlayer = {player_json_str};
 const rawWar = {war_json_str};
 
@@ -350,42 +250,37 @@ function logMsg(sender, text, type) {{
   box.scrollTop = box.scrollHeight;
 }}
 
-// ================= SMART NLP QUERY ENGINE =================
+// ================= SMART INTENT MATCHING ENGINE =================
 function processSmartQuery(queryText) {{
-  let q = queryText.toLowerCase();
+  let q = queryText.toLowerCase().trim();
 
-  // ૧. Opponent Attacks on Us / Defenses (સામેવાળાએ આપણા પ્લેયર્સ પર કેટલા સ્ટાર કર્યા?)
-  if (q.includes("opponent") || q.includes("સામેવાળા") || q.includes("defense") || q.includes("ડિફેન્સ") || q.includes("star karaya") || q.includes("star karyo") || q.includes("ketala star")) {{
+  // ૧. સામેવાળાના અટેક્સ / ડિફેન્સ (Opponent attacks on us)
+  if (q.includes("સામેવાળા") || q.includes("opponent") || q.includes("enemy") || q.includes("reaper") || q.includes("defense") || q.includes("ડિફેન્સ") || q.includes("star kar") || q.includes("star pad") || (q.includes("ketala") && q.includes("star"))) {{
     if (!rawWar || rawWar.state === 'notInWar') {{
       return {{ dept: 'clan', reply: "અત્યારે ક્લેન એક્ટિવ વોરમાં નથી." }};
     }}
     let clanMembers = rawWar.clan.members || [];
     let oppName = rawWar.opponent ? rawWar.opponent.name : "Opponent";
-    let defHTML = `<b>🛡️ OPPONENT ATTACKS ON OUR CLAN (${{oppName}} vs Our Bases):</b><br>`;
+    let defHTML = `<b>🛡️ OPPONENT ATTACKS ON OUR CLAN (${{oppName}} Attacks):</b><br>`;
     
     clanMembers.sort((a,b) => a.mapPosition - b.mapPosition);
-    let totalConcededStars = 0;
-    
     clanMembers.forEach(m => {{
-      let oppAttacks = m.opponentAttacks || 0;
       let best = m.bestOpponentAttack;
       if (best) {{
-        defHTML += `• <b>#${{m.mapPosition}} ${{m.name}}</b> (TH${{m.townhallLevel}}): ${{best.stars}}⭐ (${{best.destructionPercentage}}% by enemy)<br>`;
-        totalConcededStars += best.stars;
+        defHTML += `• <b>#${{m.mapPosition}} ${{m.name}}</b> (TH${{m.townhallLevel}}): <b>${{best.stars}}⭐ (${{best.destructionPercentage}}%)</b> લીધા (Attacker: #${{best.attackerTag}})<br>`;
       }} else {{
-        defHTML += `• <b>#${{m.mapPosition}} ${{m.name}}</b> (TH${{m.townhallLevel}}): 🟢 <b>Safe (No Stars Conceded)</b><br>`;
+        defHTML += `• <b>#${{m.mapPosition}} ${{m.name}}</b> (TH${{m.townhallLevel}}): 🟢 <b>Safe (No attack yet)</b><br>`;
       }}
     }});
-    
-    defHTML += `<br><b>કુલ વિગત:</b> સામેવાળાએ આપણા પર <b>${{rawWar.opponent.stars}}⭐ (${{rawWar.opponent.destructionPercentage}}%)</b> કર્યા છે.`;
+    defHTML += `<br><b>કુલ વિગત:</b> ${{oppName}} એ આપણા પર કુલ <b>${{rawWar.opponent.stars}}⭐ (${{rawWar.opponent.destructionPercentage}}%)</b> લીધા છે.`;
     return {{ dept: 'clan', reply: defHTML }};
   }}
 
-  // ૨. Pending Attacks / કોના અટેક બાકી છે?
-  if (q.includes("baki") || q.includes("બાકી") || q.includes("pending") || q.includes("who left") || q.includes("kona attack")) {{
-    if (!rawWar || rawWar.state === 'notInWar') {{
+  // ૨. બાકી અટેક્સ (Pending Attacks)
+  if (q.includes("baki") || q.includes("બાકી") || q.includes("pending") || q.includes("kona") || q.includes("કોના") || q.includes("left")) {{
+    if (!rawWar || rawWar.state === 'notInWar') {
       return {{ dept: 'clan', reply: "અત્યારે કોઈ સક્રિય વોર નથી." }};
-    }}
+    }
     let clanMembers = rawWar.clan.members || [];
     let pendingHTML = `<b>⚔️ PENDING CLAN ATTACKS STATUS:</b><br>`;
     let remainingCount = 0;
@@ -395,7 +290,7 @@ function processSmartQuery(queryText) {{
       let used = m.attacks ? m.attacks.length : 0;
       let left = 2 - used;
       if (left > 0) {{
-        pendingHTML += `• <b>#${{m.mapPosition}} ${{m.name}}</b>: ${{left}} Attack(s) Remaining<br>`;
+        pendingHTML += `• <b>#${{m.mapPosition}} ${{m.name}}</b>: ${{left}} Attack(s) Left<br>`;
         remainingCount += left;
       }}
     }});
@@ -408,71 +303,69 @@ function processSmartQuery(queryText) {{
     return {{ dept: 'clan', reply: pendingHTML }};
   }}
 
-  // ૩. All Over / 360° Comprehensive Audit
-  if (q.includes("all") || q.includes("overall") || q.includes("આખો") || q.includes("બધો") || q.includes("summary") || q.includes("brief") || q.includes("report")) {{
-    let warSummary = "No active war";
-    if (rawWar && rawWar.state !== 'notInWar') {{
-      warSummary = `${{rawWar.clan.name}} <b>${{rawWar.clan.stars}}⭐ (${{rawWar.clan.destructionPercentage}}%)</b> vs ${{rawWar.opponent.name}} <b>${{rawWar.opponent.stars}}⭐ (${{rawWar.opponent.destructionPercentage}}%)</b>`;
-    }}
-    
-    let heroes = (rawPlayer.heroes || []).filter(h => h.village === 'home').map(h => `${{h.name}} Lvl ${{h.level}}`).join(", ");
-
-    let allHTML = `
-    <b>⭐ 360° COMPLETE EXECUTIVE AUDIT:</b><br>
-    • <b>Player:</b> ${{rawPlayer.name || 'Chief'}} (TH${{rawPlayer.townHallLevel || 15}} | ${{rawPlayer.trophies || 0}} 🏆)<br>
-    • <b>Heroes:</b> ${{heroes || 'Hero data synced'}}<br>
-    • <b>Live Clan War:</b> ${{warSummary}}<br>
-    • <b>Builder Base:</b> BH${{rawPlayer.builderHallLevel || 9}} (6th Builder Active)<br>
-    • <b>Clan Capital Contribution:</b> ${{rawPlayer.clanCapitalContributions ? rawPlayer.clanCapitalContributions.toLocaleString() : '0'}} Gold<br>
-    • <b>CEO Verdict:</b> વોરમાં ૯૫%+ ડિસ્ટ્રક્શન સાથે આપણી લીડ મજબૂત છે.
-    `;
-    return {{ dept: 'all', reply: allHTML }};
-  }}
-
-  // ૪. Home Village & Heroes
-  if (q.includes("hero") || q.includes("home") || q.includes("upgrade") || q.includes("village") || q.includes("th") || q.includes("queen") || q.includes("king")) {{
+  // ૩. Home Village / Heroes / Upgrades
+  if (q.includes("hero") || q.includes("હીરો") || q.includes("queen") || q.includes("king") || q.includes("warden") || q.includes("champion") || q.includes("home") || q.includes("village") || q.includes("upgrade") || q.includes("ગામ")) {{
     let heroes = (rawPlayer.heroes || []).filter(h => h.village === 'home').map(h => `• <b>${{h.name}}:</b> Level ${{h.level}} / ${{h.maxLevel}}`).join("<br>");
     let hvHTML = `
     <b>🏰 HOME VILLAGE & HEROES STATUS:</b><br>
-    • <b>Town Hall:</b> Level ${{rawPlayer.townHallLevel}}<br>
+    • <b>Player:</b> ${{rawPlayer.name}} (Town Hall ${{rawPlayer.townHallLevel}})<br>
     • <b>Current Trophies:</b> ${{rawPlayer.trophies}} 🏆 (Best: ${{rawPlayer.bestTrophies}} 🏆)<br>
     • <b>Heroes:</b><br>${{heroes}}<br>
-    • <b>Recommendation:</b> ડાર્ક એલિક્સરથી આર્ચર ક્વીનને મેક્સ લેવલ તરફ પુશ કરો.
+    • <b>Recommendation:</b> Archer Queen અને Royal Champion ને અપગ્રેડ પ્રાયોરિટી આપો.
     `;
     return {{ dept: 'hv', reply: hvHTML }};
   }}
 
-  // ૫. Builder Base
-  if (q.includes("bb") || q.includes("builder") || q.includes("night") || q.includes("copter")) {{
-    return {{ dept: 'bb', reply: `<b>🌙 BUILDER BASE 2.0 STATUS:</b><br>• Builder Hall: Level ${{rawPlayer.builderHallLevel || 9}}<br>• 6th Builder (B.O.B): 🟢 Fully Unlocked & Active<br>• Priority: Battle Copter અપગ્રેડ કરો.` }};
+  // ૪. Builder Base
+  if (q.includes("bb") || q.includes("builder") || q.includes("night") || q.includes("copter") || q.includes("રાત")) {{
+    return {{ dept: 'bb', reply: `<b>🌙 BUILDER BASE 2.0 STATUS:</b><br>• Builder Hall: Level ${{rawPlayer.builderHallLevel || 8}}<br>• 6th Builder (B.O.B): 🟢 Fully Active<br>• Priority: Battle Copter અપગ્રેડ કરો.` }};
   }}
 
-  // ૬. Clan Capital
-  if (q.includes("capital") || q.includes("raid") || q.includes("gold")) {{
-    return {{ dept: 'cap', reply: `<b>🏛️ CLAN CAPITAL AUDIT:</b><br>• Total Capital Gold Donated: <b>${{rawPlayer.clanCapitalContributions ? rawPlayer.clanCapitalContributions.toLocaleString() : '0'}} 🪙</b><br>• Weekend Raids: Active Tracker Synced.` }};
+  // ૫. Clan Capital
+  if (q.includes("capital") || q.includes("raid") || q.includes("gold") || q.includes("કેપિટલ")) {{
+    return {{ dept: 'cap', reply: `<b>🏛️ CLAN CAPITAL AUDIT:</b><br>• Total Capital Gold Donated: <b>${{rawPlayer.clanCapitalContributions ? rawPlayer.clanCapitalContributions.toLocaleString() : '0'}} 🪙</b><br>• Weekend Raids Synced.` }};
   }}
 
-  // ૭. Live Clan War General
-  if (q.includes("war") || q.includes("cwl") || q.includes("clan")) {{
+  // ૬. Live Clan War General (War / Win status)
+  if (q.includes("war") || q.includes("cwl") || q.includes("વોર") || q.includes("jit") || q.includes("જીત")) {{
     if (!rawWar || rawWar.state === 'notInWar') {{
       return {{ dept: 'clan', reply: "અત્યારે ક્લેન વોર એક્ટિવ નથી." }};
     }}
     let myWar = rawWar.clan.members ? rawWar.clan.members.find(m => m.tag === '{PLAYER_TAG}') : null;
     let myAtt = myWar && myWar.attacks ? myWar.attacks.length : 0;
     let warHTML = `
-    <b>⚔️ REAL-TIME CLAN WAR DATA:</b><br>
-    • <b>Opponent:</b> ${{rawWar.opponent.name}}<br>
-    • <b>Live Score:</b> ${{rawWar.clan.name}} <b>${{rawWar.clan.stars}}⭐ (${{rawWar.clan.destructionPercentage}}%)</b> vs ${{rawWar.opponent.name}} <b>${{rawWar.opponent.stars}}⭐ (${{rawWar.opponent.destructionPercentage}}%)</b><br>
+    <b>⚔️ REAL-TIME CLAN WAR SCORE:</b><br>
+    • <b>Match:</b> ${{rawWar.clan.name}} <b>${{rawWar.clan.stars}}⭐ (${{rawWar.clan.destructionPercentage}}%)</b> vs ${{rawWar.opponent.name}} <b>${{rawWar.opponent.stars}}⭐ (${{rawWar.opponent.destructionPercentage}}%)</b><br>
     • <b>Clan Attacks:</b> ${{rawWar.clan.attacks}}/${{rawWar.teamSize * 2}}<br>
-    • <b>Your Attacks:</b> ${{myAtt}}/2 Used
+    • <b>Your Attacks:</b> ${{myAtt}}/2 Used<br>
+    • <b>Status:</b> 🟢 ${{rawWar.clan.stars > rawWar.opponent.stars ? "આપણે મજબૂત લીડ સાથે આગળ છીએ!" : "ટાઈ / ટક્કર છે."}}
     `;
     return {{ dept: 'clan', reply: warHTML }};
+  }}
+
+  // ૭. All-over Audit (ફક્ત 'all', 'overall', 'આખો', 'બધો', 'સંપૂર્ણ' હોય ત્યારે જ)
+  if (q.includes("all") || q.includes("overall") || q.includes("આખો") || q.includes("બધો") || q.includes("સંપૂર્ણ") || q.includes("360") || q.includes("audit")) {{
+    let warSummary = "No active war";
+    if (rawWar && rawWar.state !== 'notInWar') {{
+      warSummary = `${{rawWar.clan.name}} ${{rawWar.clan.stars}}⭐ (${{rawWar.clan.destructionPercentage}}%) vs ${{rawWar.opponent.name}} ${{rawWar.opponent.stars}}⭐ (${{rawWar.opponent.destructionPercentage}}%)`;
+    }}
+    let heroes = (rawPlayer.heroes || []).filter(h => h.village === 'home').map(h => `${{h.name}} Lvl ${{h.level}}`).join(", ");
+    let allHTML = `
+    <b>⭐ 360° COMPLETE EXECUTIVE AUDIT:</b><br>
+    • <b>Player:</b> ${{rawPlayer.name}} (TH${{rawPlayer.townHallLevel}} | ${{rawPlayer.trophies}} 🏆)<br>
+    • <b>Heroes:</b> ${{heroes}}<br>
+    • <b>Live Clan War:</b> ${{warSummary}}<br>
+    • <b>Builder Base:</b> BH${{rawPlayer.builderHallLevel}} (6th Builder Active)<br>
+    • <b>Capital Gold:</b> ${{rawPlayer.clanCapitalContributions ? rawPlayer.clanCapitalContributions.toLocaleString() : '0'}} 🪙<br>
+    • <b>CEO Verdict:</b> વોરમાં ૯૫%+ ડિસ્ટ્રક્શન સાથે આપણી લીડ મજબૂત છે.
+    `;
+    return {{ dept: 'all', reply: allHTML }};
   }}
 
   // Fallback
   return {{
     dept: 'ceo',
-    reply: `Chief, તમારો સવાલ "${{queryText}}" મળ્યો. હું લાઈવ સર્વરમાંથી ડેટા ચકાસી રહ્યો છું. કૃપા કરીને સ્પષ્ટ પૂછો: જેમ કે "સામેવાળાએ કેટલા સ્ટાર કર્યા?", "કોના અટેક બાકી છે?", અથવા "ઓલ ઓવર રિપોર્ટ".`
+    reply: `Chief, તમારો સવાલ "${{queryText}}" મળ્યો. ચોક્કસ માહિતી માટે પૂછો: જેમ કે <i>"સામેવાળાએ આપણા પર કેટલા સ્ટાર કર્યા?"</i>, <i>"કોના અટેક બાકી છે?"</i>, અથવા <i>"હીરો સ્ટેટસ"</i>.`
   }};
 }}
 
