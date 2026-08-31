@@ -1,0 +1,39 @@
+name: CoC 24/7 Automated Email Dispatcher
+
+on:
+  schedule:
+    # 1. દરરોજ સવારે બરાબર 7:30 AM IST (02:00 UTC) પર મોર્નિંગ રિપોર્ટ
+    - cron: '0 2 * * *'
+    # 2. દર 1 કલાકે વોર પૂરી થઈ કે નહીં તે ચેક કરવા
+    - cron: '0 * * * *'
+  workflow_dispatch: # મેન્યુઅલ રન બટન
+
+jobs:
+  dispatch-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Run Clash Scheduler Engine
+        run: |
+          # 1. વોર એન્ડ ચેક દર કલાકે થશે
+          python reporter.py --war
+
+          # 2. જો સવારના 7:30 AM (UTC 02:00) હોય તો ડેઇલી રિપોર્ટ મોકલશે
+          CURRENT_HOUR=$(date -u +'%H')
+          CURRENT_DOW=$(date -u +'%u') # 1 = Monday
+
+          if [ "$CURRENT_HOUR" -eq "02" ]; then
+            python reporter.py --daily
+          fi
+
+          # 3. જો સોમવારની સવારે હોય (Monday 7:30 AM) તો કેપિટલ રિપોર્ટ મોકલશે
+          if [ "$CURRENT_HOUR" -eq "02" ] && [ "$CURRENT_DOW" -eq "1" ]; then
+            python reporter.py --capital
+          fi
